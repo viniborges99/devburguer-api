@@ -1,16 +1,18 @@
-'use strict';
-
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.addColumn('products', 'offer', {
-      type: Sequelize.BOOLEAN,
-      defaultValue: false,
-      allowNull: false,
-    });
+  up: async (queryInterface, Sequelize) => {
+    const tableInfo = await queryInterface.describeTable('products');
+    if (!tableInfo.offer) {
+      await queryInterface.addColumn('products', 'offer', {
+        type: Sequelize.STRING,
+        allowNull: true,
+      });
+    }
   },
 
-  async down(queryInterface) {
-    await queryInterface.removeCplumn('prosucts', 'offer');
+  down: async (queryInterface, Sequelize) => {
+    const tableInfo = await queryInterface.describeTable('products');
+    if (tableInfo.offer) {
+      await queryInterface.removeColumn('products', 'offer');
+    }
   },
 };

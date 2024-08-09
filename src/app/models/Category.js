@@ -1,28 +1,26 @@
 import Sequelize, { Model } from 'sequelize';
 
 class Category extends Model {
+  // criando a model de category
   static init(sequelize) {
     super.init(
+      //essas são as propriedades que ela tem
       {
-        id: {
-          type: Sequelize.UUID,
-          defaultValue: Sequelize.UUIDV4,
-          primaryKey: true,
-        },
         name: Sequelize.STRING,
+        path: Sequelize.STRING,
+        url: {
+          type: Sequelize.VIRTUAL,
+          get() {
+            return `http://localhost:3001/category-file/${this.path}`;
+          },
+        },
       },
+
       {
         sequelize,
       },
     );
     return this;
-  }
-
-  static associate(models) {
-    this.hasMany(models.Product, {
-      foreignKey: 'category_id',
-      as: 'products',
-    });
   }
 }
 

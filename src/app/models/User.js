@@ -1,16 +1,13 @@
 import Sequelize, { Model } from 'sequelize';
+import bcrypt from 'bcrypt';
 
 class User extends Model {
   static init(sequelize) {
     super.init(
       {
-        id: {
-          type: Sequelize.UUID,
-          defaultValue: Sequelize.UUIDV4,
-          primaryKey: true,
-        },
         name: Sequelize.STRING,
         email: Sequelize.STRING,
+        password: Sequelize.VIRTUAL, //criptografar senha
         password_hash: Sequelize.STRING,
         admin: Sequelize.BOOLEAN,
       },
@@ -18,8 +15,17 @@ class User extends Model {
         sequelize,
       },
     );
+    //baixar o bcrypt e essa função e para depois que salvar criptografar a senha
+    this.addHook('beforeSave', async (user) => {
+      if (user.password) {
+        user.password_hash = await bcrypt.hash(user.password, 10);
+      }
+    });
     return this;
   }
+  async checkPassword(password) {
+    //metodo para verificar se as senhas batem
+    return bcrypt.compare(password, this.password_hash);
+  }
 }
-
 export default User;
